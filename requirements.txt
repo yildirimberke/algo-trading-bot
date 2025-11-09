@@ -1,0 +1,99 @@
+# Algo Trading Bot - Python Dependencies
+# Last Updated: 2025-11-09
+
+# ============================================
+# CORE DATA LIBRARIES
+# ============================================
+
+# Veri çekme - Yahoo Finance API
+yfinance>=0.2.32
+
+# Veri manipülasyonu
+pandas>=2.1.0
+numpy>=1.24.0
+
+# ============================================
+# TECHNICAL ANALYSIS
+# ============================================
+
+# Teknik analiz göstergeleri
+ta>=0.11.0
+
+# Alternatif: TA-Lib (opsiyonel, kurulum zor olabilir)
+# TA-Lib>=0.4.28
+
+# ============================================
+# VISUALIZATION (Backtesting için)
+# ============================================
+
+matplotlib>=3.8.0
+# seaborn>=0.13.0  # İleri seviye grafikler için (opsiyonel)
+
+# ============================================
+# TERMINAL & NOTIFICATIONS
+# ============================================
+
+# Renkli terminal çıktısı
+colorama>=0.4.6
+
+# Cross-platform bildirimler
+plyer>=2.1.0
+
+# ============================================
+# UTILITIES
+# ============================================
+
+# HTTP requests (API'ler için)
+requests>=2.31.0
+
+# JSON handling (Python built-in, ama type hints için)
+# types-requests>=2.31.0
+
+# Tarih/zaman işlemleri (Python built-in ama...)
+python-dateutil>=2.8.2
+
+# ============================================
+# DEVELOPMENT & TESTING (Opsiyonel)
+# ============================================
+
+# Testing framework
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+
+# Code quality
+# pylint>=3.0.0
+# black>=23.0.0
+
+# ============================================
+# FUTURE ADDITIONS
+# ============================================
+
+# Machine Learning (Faz 7)
+# scikit-learn>=1.3.0
+# xgboost>=2.0.0
+# tensorflow>=2.14.0  # LSTM için
+
+# Web Interface (Faz 7)
+# streamlit>=1.28.0
+# flask>=3.0.0
+
+# ============================================
+# NOTES
+# ============================================
+
+# Windows kullanıcıları için:
+#   pip install -r requirements.txt
+
+# Linux/Mac kullanıcıları için:
+#   pip3 install -r requirements.txt
+
+# Virtual environment önerilir:
+#   python -m venv venv
+#   venv\Scripts\activate  (Windows)
+#   source venv/bin/activate  (Linux/Mac)
+#   pip install -r requirements.txt
+
+# Hepsini güncelleme:
+#   pip install --upgrade -r requirements.txt
+
+

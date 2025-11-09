@@ -1,0 +1,156 @@
+# Algo Trading Bot - Git Ignore File
+
+# ============================================
+# PYTHON
+# ============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================
+# PROJECT SPECIFIC
+# ============================================
+
+# Data cache (yfinance downloaded data)
+data/cache/
+data/*.csv
+data/*.pkl
+data/*.json
+!data/.gitkeep
+
+# Paper trading records (private)
+data/trades/
+data/portfolio/
+
+# Config files with sensitive data
+config/personal_settings.json
+config/api_keys.json
+config/*_secret.json
+
+# Logs
+logs/
+*.log
+
+# Temporary analysis outputs
+output/
+reports/*.html
+reports/*.pdf
+!reports/.gitkeep
+
+# ============================================
+# IDE / EDITOR
+# ============================================
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Cursor
+.cursor/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# ============================================
+# OS
+# ============================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Linux
+*~
+.directory
+
+# ============================================
+# BACKUPS
+# ============================================
+
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# ============================================
+# KEEP EMPTY DIRECTORIES
+# ============================================
+
+# (Add .gitkeep files to empty dirs if needed)
+
+
