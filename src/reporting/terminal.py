@@ -144,3 +144,155 @@ def get_signal_text(signal: str) -> str:
     else:
         return f"{Fore.YELLOW}{signal}{Style.RESET_ALL}"
 
+
+def print_hybrid_report(analysis: Dict, signals: Dict, hybrid_result: Dict, recommendation: str):
+    """
+    Hibrid analiz (Teknik + Makro) sonuçlarını yazdırır.
+    
+    Args:
+        analysis: Teknik analiz sonuçları
+        signals: Teknik sinyal sonuçları
+        hybrid_result: Hibrid analiz sonuçları
+        recommendation: Yatırım önerisi
+    """
+    
+    if 'error' in analysis:
+        print(f"{Fore.RED}[HATA] {analysis['error']}{Style.RESET_ALL}")
+        return
+    
+    symbol = analysis.get('symbol', 'N/A')
+    price = analysis.get('current_price', 0)
+    date = analysis.get('date', 'N/A')
+    
+    # Başlık
+    print("\n" + "=" * 80)
+    print(f"{Fore.CYAN}     HİBRİD ANALİZ RAPORU - {symbol} (Teknik + Makro){Style.RESET_ALL}")
+    print("=" * 80)
+    
+    print(f"\nTarih: {date}")
+    print(f"Guncel Fiyat: {Fore.YELLOW}{price:.2f} TL{Style.RESET_ALL}")
+    
+    # Hibrid Genel Değerlendirme
+    print("\n" + "-" * 80)
+    print(f"{Fore.MAGENTA}HIBRİD GENEL DEGERLENDİRME{Style.RESET_ALL}")
+    print("-" * 80)
+    
+    signal = hybrid_result['signal']
+    emoji = hybrid_result['signal_emoji']
+    score = hybrid_result['hybrid_score']
+    confidence = hybrid_result['confidence']
+    
+    print(f"\nHibrid Skor: {Fore.CYAN}{score}/100{Style.RESET_ALL}")
+    print(f"Sinyal: {emoji} {Fore.GREEN if signal == 'AL' else Fore.RED if signal == 'SAT' else Fore.YELLOW}{signal}{Style.RESET_ALL}")
+    print(f"Guven Seviyesi: {confidence}")
+    print(f"Agirliklar: Teknik %{hybrid_result['weights']['technical']} | Makro %{hybrid_result['weights']['macro']}")
+    
+    # Uyum Durumu
+    alignment = hybrid_result['alignment']
+    print(f"\n{alignment['emoji']} Uyum Durumu: {alignment['status']}")
+    print(f"   {alignment['description']}")
+    
+    # Teknik Özet
+    print("\n" + "-" * 80)
+    print(f"{Fore.GREEN}1) TEKNİK ANALİZ ÖZET{Style.RESET_ALL}")
+    print("-" * 80)
+    
+    tech = hybrid_result['technical']
+    tech_signal = signals.get('overall_signal', 'HOLD')
+    
+    print(f"Teknik Skor: {tech['score']}/100")
+    print(f"Yon: {tech['direction']}")
+    print(f"Teknik Sinyal: {get_signal_text(tech_signal)}")
+    print(f"Guven: {signals.get('confidence', 0)}%")
+    
+    # Makro Analiz
+    print("\n" + "-" * 80)
+    print(f"{Fore.GREEN}2) MAKRO EKONOMİK ANALİZ{Style.RESET_ALL}")
+    print("-" * 80)
+    
+    macro = hybrid_result['macro']
+    general = macro['general']
+    
+    print(f"\nMakro Skor: {macro['score_raw']}/10 (Normalize: {macro['score_normalized']}/100)")
+    print(f"Yon: {macro['direction']}")
+    print(f"\n{general['summary']}")
+    
+    # Makro Detaylar
+    print(f"\n{Fore.CYAN}Makro Faktörler:{Style.RESET_ALL}")
+    
+    for key, comp in general['components'].items():
+        score_color = Fore.GREEN if comp['score'] > 2 else Fore.RED if comp['score'] < -2 else Fore.YELLOW
+        print(f"\n  {key.upper().replace('_', '/')}:")
+        print(f"    Skor: {score_color}{comp['score']:.1f}/10{Style.RESET_ALL} (Agirlik: %{comp['weight']*100:.0f})")
+        print(f"    {comp['description']}")
+    
+    # Sektörel Analiz
+    print(f"\n{Fore.CYAN}Sektörel Faktör:{Style.RESET_ALL}")
+    sector = macro['sector']
+    sector_color = Fore.GREEN if sector['score'] > 2 else Fore.RED if sector['score'] < -2 else Fore.YELLOW
+    print(f"  Sektor: {sector['name']}")
+    print(f"  Skor: {sector_color}{sector['score']:.1f}/10{Style.RESET_ALL}")
+    print(f"  {sector['description']}")
+    
+    # Risk Analizi
+    print("\n" + "-" * 80)
+    print(f"{Fore.GREEN}3) RİSK DEGERLENDİRMESİ{Style.RESET_ALL}")
+    print("-" * 80)
+    
+    risk = hybrid_result['risk']
+    risk_color = Fore.GREEN if risk['level'] == 'DÜŞÜK' else Fore.RED if risk['level'] == 'YÜKSEK' else Fore.YELLOW
+    
+    print(f"\nRisk Seviyesi: {risk_color}{risk['level']}{Style.RESET_ALL}")
+    print(f"{risk['description']}")
+    
+    # Yatırım Önerisi
+    print("\n" + "-" * 80)
+    print(f"{Fore.GREEN}4) YATIRIM ÖNERİSİ{Style.RESET_ALL}")
+    print("-" * 80)
+    print()
+    print(recommendation)
+    
+    # Alt bilgi
+    print("\n" + "=" * 80)
+    print(f"{Fore.MAGENTA}NOT:{Style.RESET_ALL} Bu hibrid analiz egitim amacidir, yatirim tavsiyesi degildir!")
+    print(f"{Fore.MAGENTA}UYARI:{Style.RESET_ALL} Makro veriler periyodik guncellenmeli (update_macro.py kullanarak)")
+    print("=" * 80 + "\n")
+
+
+def print_macro_data_summary(macro_data: Dict):
+    """
+    Makro verilerin özetini yazdırır
+    
+    Args:
+        macro_data: Makroekonomik veriler
+    """
+    print("\n" + "=" * 70)
+    print(f"{Fore.CYAN}       MAKRO EKONOMİK VERİLER{Style.RESET_ALL}")
+    print("=" * 70)
+    
+    print(f"\nSon Guncelleme: {macro_data.get('last_update', 'Bilinmiyor')}")
+    
+    print(f"\n{Fore.GREEN}Doviz Kurlari:{Style.RESET_ALL}")
+    usd = macro_data.get('usd_try', {})
+    eur = macro_data.get('eur_try', {})
+    print(f"  USD/TRY: {usd.get('current', 'N/A')} (30g: %{usd.get('change_30d', 'N/A')})")
+    print(f"  EUR/TRY: {eur.get('current', 'N/A')} (30g: %{eur.get('change_30d', 'N/A')})")
+    
+    print(f"\n{Fore.GREEN}Piyasa Göstergeleri:{Style.RESET_ALL}")
+    bist = macro_data.get('bist100', {})
+    print(f"  BIST100: {bist.get('current', 'N/A')} (Trend: {bist.get('trend', 'N/A')})")
+    
+    print(f"\n{Fore.GREEN}Emtialar:{Style.RESET_ALL}")
+    oil = macro_data.get('oil', {})
+    gold = macro_data.get('gold', {})
+    print(f"  Petrol (WTI): ${oil.get('current', 'N/A')} (30g: %{oil.get('change_30d', 'N/A')})")
+    print(f"  Altin: ${gold.get('current', 'N/A')} (30g: %{gold.get('change_30d', 'N/A')})")
+    
+    print(f"\n{Fore.GREEN}Faiz:{Style.RESET_ALL}")
+    tcmb = macro_data.get('tcmb_rate')
+    if tcmb:
+        print(f"  TCMB Politika Faizi: %{tcmb}")
+    else:
+        print(f"  {Fore.YELLOW}TCMB Politika Faizi: Girilmemis (update_macro.py --tcmb-rate X){Style.RESET_ALL}")
+    
+    print("\n" + "=" * 70 + "\n")

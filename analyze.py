@@ -7,17 +7,22 @@ Kullanim:
     python analyze.py THYAO
     python analyze.py SASA --period 6mo
     python analyze.py GARAN --detailed
+    python analyze.py THYAO --macro
 
 Yazar: Berke Yildirim
 Tarih: 2025-11-09
+Guncelleme: 2025-11-11 (Faz 2: Makro entegrasyonu)
 """
 
 import sys
 import argparse
+import os
 from src.data.fetcher import fetch_stock_data
 from src.data.bist_stocks import is_valid_bist_stock, suggest_similar_stocks
 from src.analysis.technical import analyze_stock, generate_signals
-from src.reporting.terminal import print_analysis_report
+from src.reporting.terminal import print_analysis_report, print_hybrid_report
+from src.macro.fetcher import MacroDataFetcher
+from src.analysis.hybrid import HybridAnalyzer
 
 
 def main():
@@ -25,16 +30,19 @@ def main():
     
     # Argument parser
     parser = argparse.ArgumentParser(
-        description='BIST hisse senedi teknik analiz araci',
+        description='BIST hisse senedi analiz araci (Teknik + Makro)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Ornekler:
-  python analyze.py THYAO
-  python analyze.py SASA --period 6mo
-  python analyze.py GARAN --detailed
+  python analyze.py THYAO                # Sadece teknik analiz
+  python analyze.py SASA --period 6mo    # 6 aylik veri
+  python analyze.py THYAO --macro        # Hibrid analiz (Teknik + Makro)
+  python analyze.py GARAN --detailed     # Detayli rapor
 
 Desteklenen periyotlar:
   1d, 5d, 1mo, 3mo, 6mo, 1y (varsayilan), 2y, 5y, max
+
+Not: --macro kullanmadan once: python update_macro.py
         """
     )
     
@@ -52,6 +60,12 @@ Desteklenen periyotlar:
     )
     
     parser.add_argument(
+        '--macro',
+        action='store_true',
+        help='Makroekonomik analiz ekle (Hibrid mod)'
+    )
+    
+    parser.add_argument(
         '--detailed',
         action='store_true',
         help='Detayli rapor (gelecekte eklenecek)'
@@ -64,7 +78,11 @@ Desteklenen periyotlar:
     
     # Banner
     print("\n" + "="*70)
-    print("       ALGO TRADING BOT - Teknik Analiz Sistemi v0.1")
+    if args.macro:
+        print("    ALGO TRADING BOT - Hibrid Analiz Sistemi v0.2")
+        print("         (Teknik Analiz + Makroekonomik Faktörler)")
+    else:
+        print("       ALGO TRADING BOT - Teknik Analiz Sistemi v0.1")
     print("="*70)
     
     # BIST hissesi kontrolü
@@ -100,13 +118,51 @@ Desteklenen periyotlar:
     print(f"[OK] {len(analysis.get('signals', []))} gosterge hesaplandi.")
     
     # Sinyal üret
-    print(f"\n[ADIM 3] Genel sinyal ureti liyor...")
+    print(f"\n[ADIM 3] Genel sinyal uretiliyor...")
     signals = generate_signals(analysis)
     
     print(f"[OK] Analiz tamamlandi!")
     
-    # Rapor yazdır
-    print_analysis_report(analysis, signals)
+    # Makro analiz istendi mi?
+    if args.macro:
+        print(f"\n[ADIM 4] Makroekonomik veriler yukleniyor...")
+        
+        # Makro veri yükle
+        fetcher = MacroDataFetcher()
+        macro_data = fetcher.load_from_config()
+        
+        if macro_data is None:
+            print(f"[HATA] Makro veriler bulunamadi!")
+            print(f"[COZUM] Once makro verileri guncelleyin: python update_macro.py")
+            sys.exit(1)
+        
+        print(f"[OK] Makro veriler yuklendi (Son guncelleme: {macro_data.get('last_update', 'Bilinmiyor')})")
+        
+        # Hibrid analiz
+        print(f"\n[ADIM 5] Hibrid analiz yapiliyor (Teknik + Makro)...")
+        
+        technical_score = signals.get('score', 50)  # Teknik skor (0-100)
+        
+        hybrid_analyzer = HybridAnalyzer(
+            technical_score=technical_score,
+            macro_data=macro_data,
+            symbol=symbol
+        )
+        
+        hybrid_result = hybrid_analyzer.calculate_hybrid_score()
+        recommendation = hybrid_analyzer.get_recommendation(hybrid_result)
+        
+        print(f"[OK] Hibrid analiz tamamlandi!")
+        
+        # Hibrid rapor yazdır
+        print_hybrid_report(analysis, signals, hybrid_result, recommendation)
+    else:
+        # Normal teknik rapor
+        print_analysis_report(analysis, signals)
+        
+        # Makro öneri
+        print(f"\n[IPUCU] Makroekonomik faktörleri de analiz etmek icin:")
+        print(f"         python analyze.py {symbol} --macro")
     
     # Ek bilgi
     if args.detailed:

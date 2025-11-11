@@ -1,0 +1,25 @@
+{
+  "last_update": "2025-11-11 18:35:32",
+  "usd_try": {
+    "current": 42.23,
+    "change_30d": 1.26
+  },
+  "eur_try": {
+    "current": 49.03,
+    "change_30d": 0.38
+  },
+  "bist100": {
+    "current": 10576.45,
+    "trend": "flat",
+    "change_30d": -2.2
+  },
+  "oil": {
+    "current": 60.84,
+    "change_30d": -1.44
+  },
+  "gold": {
+    "current": 4120.4,
+    "change_30d": 3.62
+  },
+  "tcmb_rate": 39.5
+}
